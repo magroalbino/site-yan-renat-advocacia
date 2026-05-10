@@ -732,7 +732,7 @@ body {
 
 /* Estilos para a página de artigo */
 .artigo-content {
-    padding: 60px 0;
+    padding: 120px 0 60px 0;  /* 120px no topo para afastar do menu fixo */
     background-color: #F8F9FA;
     color: #212529;
 }
