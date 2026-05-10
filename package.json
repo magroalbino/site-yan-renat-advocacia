@@ -1,0 +1,28 @@
+{
+  "name": "site-yan-renat-advocacia",
+  "version": "1.0.0",
+  "description": "Site institucional do escritório Yan Renat Advocacia",
+  "main": "index.html",
+  "scripts": {
+    "start": "vite",
+    "dev": "npx serve .",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "advocacia",
+    "site",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "Yan Renat",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "mongodb": "^7.0.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.0"
+  }
+}

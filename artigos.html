@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artigo - Yan Renat Advocacia</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Roboto:wght@400;500&family=Poppins:wght@300;400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Cabeçalho (mesmo do index.html, porém sem a seção 'Contato' no menu) -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo-yan-renat3.jpg"
+                        alt="Logotipo do escritório Yan Renat Advocacia e Consultoria Jurídica" class="logo-img">
+                </a>
+            </div>
+            <button class="menu-toggle" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="index.html#home">Início</a></li>
+                    <li><a href="index.html#sobre">Sobre</a></li>
+                    <li><a href="index.html#areas">Áreas de Atuação</a></li>
+                    <li><a href="index.html#artigos">Artigos Jurídicos</a></li>
+                    <!-- Produtos e Contato removidos -->
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <div class="social-top">
+                    <a href="https://www.linkedin.com/in/yan-leite/" target="_blank"
+                        aria-label="Perfil LinkedIn de Yan Renat"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/yanleite.adv/" target="_blank"
+                        aria-label="Perfil Instagram de Yan Renat"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/yanrenatleite" target="_blank" aria-label="Perfil X de Yan Renat"><i
+                            class="fab fa-x"></i></a>
+                    <a href="https://www.youtube.com/@DireitoNaPráticaComYanRenat" target="_blank"
+                        aria-label="Canal YouTube de Yan Renat"><i class="fab fa-youtube"></i></a>
+                </div>
+                <a href="index.html#contato" class="btn-cta">Fale Conosco</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Botão Flutuante WhatsApp -->
+    <div class="whatsapp-container">
+        <a href="https://wa.me/5571994012015" target="_blank" class="whatsapp-float" aria-label="Contato via WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <span class="whatsapp-text">Como posso ajudar?</span>
+    </div>
+
+    <!-- Conteúdo do Artigo -->
+    <section class="artigo-content">
+        <div class="container">
+            <h1 id="artigo-titulo">Carregando...</h1>
+            <p id="artigo-autor"><em>Publicado em: <span id="artigo-data"></span> por <span
+                        id="artigo-autor-nome"></span></em></p>
+            <div id="artigo-conteudo"></div>
+
+            <!-- Área de curtidas -->
+            <div class="artigo-meta" style="margin: 30px 0; display: flex; align-items: center; gap: 10px;">
+                <button id="btn-curtir" data-id="">
+                    <i class="far fa-thumbs-up"></i> Curtir
+                </button>
+                <span id="curtidas-count">0</span> curtidas
+            </div>
+
+            <!-- Comentários -->
+            <div class="comentarios" style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 30px;">
+                <h3>Comentários</h3>
+                <div id="lista-comentarios"></div>
+
+                <!-- Formulário de Comentário -->
+                <div class="comentario-form" style="margin-top: 40px;">
+                    <h4>Deixe seu Comentário</h4>
+                    <form id="form-comentario">
+                        <input type="text" id="comentario-nome" placeholder="Seu Nome" required>
+                        <textarea id="comentario-texto" placeholder="Digite seu comentário..." required></textarea>
+                        <button type="submit" class="btn-cta" id="btn-enviar-comentario">Enviar Comentário</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Yan Renat Advocacia e Consultoria Jurídica. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug');
+        const backendUrl = 'https://site-backend-yan-renat-advocacia.vercel.app';
+
+        let artigoId = null; // Vamos guardar o ID do artigo após carregar
+
+        async function carregarArtigo() {
+            if (!slug) {
+                document.getElementById('artigo-titulo').textContent = 'Artigo não encontrado';
+                document.getElementById('artigo-conteudo').innerHTML = '<p>O artigo solicitado não foi encontrado ou o link está quebrado.</p>';
+                return;
+            }
+
+            try {
+                // Busca por slug usando query param (padrão do backend)
+                const response = await fetch(`${backendUrl}/api/artigos?slug=${slug}`);
+                if (!response.ok) throw new Error('Artigo não encontrado');
+                const artigos = await response.json();
+                if (!artigos.length) throw new Error('Artigo não encontrado');
+
+                const artigo = artigos[0];
+                artigoId = artigo._id; // Guarda o ID para curtir/comentários
+
+                document.getElementById('artigo-titulo').textContent = artigo.titulo;
+                document.getElementById('artigo-autor-nome').textContent = artigo.autor || 'Yan Renat';
+                document.getElementById('artigo-data').textContent = new Date(artigo.data || new Date()).toLocaleDateString('pt-BR');
+
+                // Formata o conteúdo com parágrafos
+                const conteudoFormatado = artigo.conteudo.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('');
+                document.getElementById('artigo-conteudo').innerHTML = conteudoFormatado;
+
+                // Atualiza botão de curtir e contador
+                document.getElementById('curtidas-count').textContent = artigo.curtidas || 0;
+                document.getElementById('btn-curtir').setAttribute('data-id', artigoId);
+
+                // Carrega comentários após ter o ID
+                carregarComentarios();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('artigo-titulo').textContent = 'Erro ao carregar';
+                document.getElementById('artigo-conteudo').innerHTML = '<p>Não foi possível carregar o conteúdo do artigo no momento.</p>';
+            }
+        }
+
+        async function carregarComentarios() {
+            if (!artigoId) return;
+            try {
+                const response = await fetch(`${backendUrl}/api/artigos/${artigoId}/comentarios`);
+                const comentarios = await response.json(); // array direto
+
+                const lista = document.getElementById('lista-comentarios');
+                lista.innerHTML = comentarios.length === 0
+                    ? '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>'
+                    : '';
+
+                comentarios.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'comentario'; // usa a classe do CSS já existente
+                    div.innerHTML = `
+                        <strong>${c.nome}</strong>
+                        <p>${c.conteudo.replace(/\n/g, '<br>')}</p>
+                        <small>${new Date(c.data).toLocaleDateString('pt-BR')} às ${new Date(c.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
+                    `;
+                    lista.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Erro ao carregar comentários:', err);
+                document.getElementById('lista-comentarios').innerHTML = '<p>Erro ao carregar comentários.</p>';
+            }
+        }
+
+        // Evento de curtir
+        document.getElementById('btn-curtir').addEventListener('click', async function () {
+            const id = this.dataset.id;
+            if (!id) return;
+            try {
+                const res = await fetch(`${backendUrl}/api/artigos/${id}/curtir`, { method: 'POST' });
+                const data = await res.json();
+                document.getElementById('curtidas-count').textContent = data.curtidas;
+            } catch (err) {
+                console.error('Erro ao curtir:', err);
+            }
+        });
+
+        // Evento de enviar comentário
+        document.getElementById('form-comentario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!artigoId) return;
+
+            const nomeInput = document.getElementById('comentario-nome');
+            const textoInput = document.getElementById('comentario-texto');
+            const btnEnviar = document.getElementById('btn-enviar-comentario');
+
+            const nome = nomeInput.value.trim();
+            const conteudo = textoInput.value.trim();
+
+            btnEnviar.disabled = true;
+            btnEnviar.textContent = 'Enviando...';
+
+            try {
+                const response = await fetch(`${backendUrl}/api/artigos/${artigoId}/comentarios`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, conteudo })
+                });
+
+                if (response.ok) {
+                    nomeInput.value = '';
+                    textoInput.value = '';
+                    carregarComentarios();
+                } else {
+                    alert('Erro ao enviar comentário. Por favor, tente novamente.');
+                }
+            } catch (err) {
+                console.error('Erro ao enviar comentário:', err);
+                alert('Erro de conexão ao enviar comentário.');
+            } finally {
+                btnEnviar.disabled = false;
+                btnEnviar.textContent = 'Enviar Comentário';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarArtigo);
+
+        // Menu mobile
+        const menuToggle = document.querySelector('.menu-toggle');
+        const nav = document.querySelector('.nav');
+        if (menuToggle && nav) {
+            menuToggle.addEventListener('click', () => nav.classList.toggle('active'));
+        }
+    </script>
+</body>
+
+</html>
