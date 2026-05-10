@@ -1,7 +1,7 @@
 # Yan Renat Advocacia e Consultoria Jurídica
 
 ## 📌 Descrição do Projeto
-Site institucional do **Yan Renat Advocacia e Consultoria Jurídica**, desenvolvido com **HTML5, CSS3 e JavaScript puro**. O projeto tem como objetivo apresentar o escritório, suas áreas de atuação, produtos jurídicos, artigos informativos e um canal de contato funcional.
+Site institucional do **Yan Renat Advocacia e Consultoria Jurídica**, desenvolvido com **HTML5, CSS3 e JavaScript puro**. O projeto tem como objetivo apresentar o escritório, suas áreas de atuação, artigos informativos e um canal de contato funcional.
 
 O layout é **moderno, responsivo e otimizado para desktop e dispositivos móveis**, contando com menu hamburger em telas menores e botão flutuante de WhatsApp para contato rápido.
 
