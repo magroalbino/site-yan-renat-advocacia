@@ -103,14 +103,28 @@
         const slug = params.get('slug');
         let artigoId = null;
 
-        async function carregarArtigo() {
-            const tituloEl = document.getElementById('artigo-titulo');
-            const conteudoEl = document.getElementById('artigo-conteudo');
-            const autorNomeEl = document.getElementById('artigo-autor-nome');
-            const dataEl = document.getElementById('artigo-data');
-            const curtidasEl = document.getElementById('curtidas-count');
-            const btnCurtir = document.getElementById('btn-curtir');
+        // Elementos
+        const tituloEl = document.getElementById('artigo-titulo');
+        const conteudoEl = document.getElementById('artigo-conteudo');
+        const autorNomeEl = document.getElementById('artigo-autor-nome');
+        const dataEl = document.getElementById('artigo-data');
+        const curtidasEl = document.getElementById('curtidas-count');
+        const btnCurtir = document.getElementById('btn-curtir');
 
+        // Atualiza o botão de acordo com o estado armazenado no navegador
+        function atualizarBotaoCurtir() {
+            if (!artigoId) return;
+            const liked = localStorage.getItem(`like_${artigoId}`) === 'true';
+            if (liked) {
+                btnCurtir.innerHTML = '<i class="fas fa-thumbs-down"></i> Descurtir';
+                btnCurtir.classList.add('descurtir');
+            } else {
+                btnCurtir.innerHTML = '<i class="far fa-thumbs-up"></i> Curtir';
+                btnCurtir.classList.remove('descurtir');
+            }
+        }
+
+        async function carregarArtigo() {
             if (!slug) {
                 tituloEl.textContent = 'Artigo não encontrado';
                 conteudoEl.innerHTML = '<p>O artigo solicitado não foi encontrado.</p>';
@@ -126,30 +140,26 @@
                 const artigo = artigos[0];
                 artigoId = artigo._id;
 
-                // Preenche os campos com segurança
                 tituloEl.textContent = artigo.titulo || 'Título não disponível';
                 autorNomeEl.textContent = artigo.autor || 'Yan Renat';
-                dataEl.textContent = artigo.data ? new Date(artigo.data).toLocaleDateString('pt-BR') : 'Data não informada';
+                dataEl.textContent = artigo.data ? new Date(artigo.data).toLocaleDateString('pt-BR') : '';
 
-                // Conteúdo: verifica se existe e formata parágrafos
-                if (artigo.conteudo && typeof artigo.conteudo === 'string') {
+                if (artigo.conteudo && artigo.conteudo.trim().length > 0) {
                     const paragrafos = artigo.conteudo.split('\n').filter(p => p.trim() !== '');
                     conteudoEl.innerHTML = paragrafos.map(p => `<p>${p.trim()}</p>`).join('');
                 } else {
                     conteudoEl.innerHTML = '<p>Conteúdo não disponível.</p>';
                 }
 
-                // Curtidas
                 curtidasEl.textContent = artigo.curtidas || 0;
                 btnCurtir.setAttribute('data-id', artigoId);
+                atualizarBotaoCurtir();
 
-                // Carrega comentários
                 carregarComentarios();
             } catch (error) {
                 console.error('Erro ao carregar artigo:', error);
                 tituloEl.textContent = 'Erro ao carregar';
                 conteudoEl.innerHTML = '<p>Não foi possível carregar o conteúdo do artigo no momento.</p>';
-                // Mesmo no erro, mantém data e autor vazios
                 autorNomeEl.textContent = '';
                 dataEl.textContent = '';
                 curtidasEl.textContent = '0';
@@ -163,7 +173,7 @@
                 const response = await fetch(`${backendUrl}/api/comentarios/${slug}`);
                 if (!response.ok) throw new Error('Erro ao buscar comentários');
                 const data = await response.json();
-                const comentarios = data.comments || data; // depende da API
+                const comentarios = data.comments || data;
                 if (!comentarios || comentarios.length === 0) {
                     lista.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>';
                     return;
@@ -181,16 +191,32 @@
             }
         }
 
-        // Evento de curtir
-        document.getElementById('btn-curtir').addEventListener('click', async function () {
+        // Evento de curtir/descurtir
+        btnCurtir.addEventListener('click', async function () {
             const id = this.dataset.id;
             if (!id) return;
+
+            const liked = localStorage.getItem(`like_${id}`) === 'true';
+            const endpoint = liked ? 'descurtir' : 'curtir';
+            const url = `${backendUrl}/api/artigos/${id}/${endpoint}`;
+
             try {
-                const res = await fetch(`${backendUrl}/api/artigos/${id}/curtir`, { method: 'POST' });
+                const res = await fetch(url, { method: 'POST' });
+                if (!res.ok) throw new Error('Erro na requisição');
                 const data = await res.json();
+
                 document.getElementById('curtidas-count').textContent = data.curtidas;
+
+                // Alterna o estado
+                if (liked) {
+                    localStorage.removeItem(`like_${id}`);
+                } else {
+                    localStorage.setItem(`like_${id}`, 'true');
+                }
+                atualizarBotaoCurtir();
             } catch (err) {
-                console.error('Erro ao curtir:', err);
+                console.error('Erro ao curtir/descurtir:', err);
+                alert('Não foi possível realizar a ação.');
             }
         });
 
@@ -234,7 +260,6 @@
             menuToggle.addEventListener('click', () => nav.classList.toggle('active'));
         }
 
-        // Inicia carregamento
         carregarArtigo();
     </script>
 </body>
