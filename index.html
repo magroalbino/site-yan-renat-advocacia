@@ -188,15 +188,18 @@
                     return;
                 }
 
-                grid.innerHTML = artigos.map(artigo => `
-                    <article class="artigo-card">
-                        <div class="artigo-content">
-                            <h3>${artigo.titulo}</h3>
-                            const resumo = artigo.descricao || (artigo.conteudo ? artigo.conteudo.substring(0, 150) + '...' : 'Leia o artigo completo');
-                            <a href="artigos.html?slug=${artigo.slug}" class="btn-leia-mais">Leia mais</a>
-                        </div>
-                    </article>
-                `).join('');
+                grid.innerHTML = artigos.map(artigo => {
+                    const resumo = artigo.descricao || (artigo.conteudo ? artigo.conteudo.substring(0, 150) + '...' : 'Leia o artigo completo');
+                    return `
+                        <article class="artigo-card">
+                           <div class="artigo-content">
+                              <h3>${artigo.titulo}</h3>
+                              <p>${resumo}</p>
+                              <a href="artigos.html?slug=${artigo.slug}" class="btn-leia-mais">Leia mais</a>
+                           </div>
+                        </article>
+                 `;
+                }).join('');
             } catch (error) {
                 console.error('Erro ao carregar artigos:', error);
                 grid.innerHTML = '<p>Não foi possível carregar os artigos no momento.</p>';

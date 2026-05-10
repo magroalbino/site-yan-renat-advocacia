@@ -379,47 +379,60 @@ body {
 }
 
 .artigos-grid {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    justify-items: center;
     align-items: stretch;
 }
 
 .artigo-card {
     background-color: #FFFFFF;
     color: #0F212F;
-    padding: 12px;
-    border-radius: 5px;
+    padding: 20px 15px;
+    border-radius: 8px;
     text-align: center;
     width: 100%;
-    max-width: 300px;
-    transition: transform 0.3s;
-    flex: 1 1 calc(33% - 20px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 380px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .artigo-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .artigo-card h3 {
     font-family: 'Oswald', sans-serif;
-    font-size: 18px;
-    margin-bottom: 8px;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
 }
 
 .artigo-card p {
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    flex-grow: 1;
 }
 
-.artigo-card .artigo-link {
+/* Botão "Leia mais" – substitui .artigo-link */
+.btn-leia-mais {
+    background-color: #DAA14F;
+    color: #FFFFFF;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
     display: inline-block;
-    padding: 6px 12px;
-    font-size: 12px;
-    min-width: 80px;
+    transition: background-color 0.3s;
+    align-self: center; /* centraliza o botão no card flex */
+}
+
+.btn-leia-mais:hover {
+    background-color: #C68E3A;
 }
 
 /* Contato */
