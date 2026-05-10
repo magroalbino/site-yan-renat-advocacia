@@ -192,7 +192,7 @@
                     <article class="artigo-card">
                         <div class="artigo-content">
                             <h3>${artigo.titulo}</h3>
-                            <p>${artigo.resumo || artigo.conteudo.substring(0, 150) + '...'}</p>
+                            const resumo = artigo.descricao || (artigo.conteudo ? artigo.conteudo.substring(0, 150) + '...' : 'Leia o artigo completo');
                             <a href="artigos.html?slug=${artigo.slug}" class="btn-leia-mais">Leia mais</a>
                         </div>
                     </article>
