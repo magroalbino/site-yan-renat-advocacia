@@ -5,19 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artigo - Yan Renat Advocacia</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-
     <link rel="stylesheet" href="styles.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Roboto:wght@400;500&family=Poppins:wght@300;400&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 
 <body>
-    <!-- Cabeçalho (mesmo do index.html, porém sem a seção 'Contato' no menu) -->
+    <!-- Cabeçalho (mesmo do index.html) -->
     <header class="header">
         <div class="container">
             <div class="logo">
@@ -33,26 +30,24 @@
                     <li><a href="index.html#sobre">Sobre</a></li>
                     <li><a href="index.html#areas">Áreas de Atuação</a></li>
                     <li><a href="index.html#artigos">Artigos Jurídicos</a></li>
-                    <!-- Produtos e Contato removidos -->
                 </ul>
             </nav>
             <div class="header-actions">
                 <div class="social-top">
-                    <a href="https://www.linkedin.com/in/yan-leite/" target="_blank"
-                        aria-label="Perfil LinkedIn de Yan Renat"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://www.instagram.com/yanleite.adv/" target="_blank"
-                        aria-label="Perfil Instagram de Yan Renat"><i class="fab fa-instagram"></i></a>
-                    <a href="https://x.com/yanrenatleite" target="_blank" aria-label="Perfil X de Yan Renat"><i
-                            class="fab fa-x"></i></a>
+                    <a href="https://www.linkedin.com/in/yan-leite/" target="_blank" aria-label="LinkedIn"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/yanleite.adv/" target="_blank" aria-label="Instagram"><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/yanrenatleite" target="_blank" aria-label="X"><i class="fab fa-x"></i></a>
                     <a href="https://www.youtube.com/@DireitoNaPráticaComYanRenat" target="_blank"
-                        aria-label="Canal YouTube de Yan Renat"><i class="fab fa-youtube"></i></a>
+                        aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                 </div>
                 <a href="index.html#contato" class="btn-cta">Fale Conosco</a>
             </div>
         </div>
     </header>
 
-    <!-- Botão Flutuante WhatsApp -->
+    <!-- WhatsApp Flutuante -->
     <div class="whatsapp-container">
         <a href="https://wa.me/5571994012015" target="_blank" class="whatsapp-float" aria-label="Contato via WhatsApp">
             <i class="fab fa-whatsapp"></i>
@@ -68,26 +63,27 @@
                         id="artigo-autor-nome"></span></em></p>
             <div id="artigo-conteudo"></div>
 
-            <!-- Área de curtidas -->
-            <div class="artigo-meta" style="margin: 30px 0; display: flex; align-items: center; gap: 10px;">
-                <button id="btn-curtir" data-id="">
+            <!-- Curtidas -->
+            <div class="artigo-meta" style="margin: 30px 0; display: flex; align-items: center; gap: 15px;">
+                <button id="btn-curtir" class="btn-leia-mais" data-id="">
                     <i class="far fa-thumbs-up"></i> Curtir
                 </button>
-                <span id="curtidas-count">0</span> curtidas
+                <span id="curtidas-count" style="font-weight: bold;">0</span> curtidas
             </div>
 
+            <hr>
+
             <!-- Comentários -->
-            <div class="comentarios" style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 30px;">
-                <h3>Comentários</h3>
+            <div class="comentarios" style="margin-top: 50px;">
+                <h2>Comentários</h2>
                 <div id="lista-comentarios"></div>
 
-                <!-- Formulário de Comentário -->
                 <div class="comentario-form" style="margin-top: 40px;">
                     <h4>Deixe seu Comentário</h4>
                     <form id="form-comentario">
                         <input type="text" id="comentario-nome" placeholder="Seu Nome" required>
                         <textarea id="comentario-texto" placeholder="Digite seu comentário..." required></textarea>
-                        <button type="submit" class="btn-cta" id="btn-enviar-comentario">Enviar Comentário</button>
+                        <button type="submit" class="btn-cta">Enviar Comentário</button>
                     </form>
                 </div>
             </div>
@@ -97,79 +93,91 @@
     <!-- Rodapé -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Yan Renat Advocacia e Consultoria Jurídica. Todos os direitos reservados.</p>
+            <p>&copy; 2026 Yan Renat Advocacia e Consultoria Jurídica. Todos os direitos reservados.</p>
         </div>
     </footer>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const slug = urlParams.get('slug');
         const backendUrl = 'https://site-backend-yan-renat-advocacia.vercel.app';
-
-        let artigoId = null; // Vamos guardar o ID do artigo após carregar
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get('slug');
+        let artigoId = null;
 
         async function carregarArtigo() {
+            const tituloEl = document.getElementById('artigo-titulo');
+            const conteudoEl = document.getElementById('artigo-conteudo');
+            const autorNomeEl = document.getElementById('artigo-autor-nome');
+            const dataEl = document.getElementById('artigo-data');
+            const curtidasEl = document.getElementById('curtidas-count');
+            const btnCurtir = document.getElementById('btn-curtir');
+
             if (!slug) {
-                document.getElementById('artigo-titulo').textContent = 'Artigo não encontrado';
-                document.getElementById('artigo-conteudo').innerHTML = '<p>O artigo solicitado não foi encontrado ou o link está quebrado.</p>';
+                tituloEl.textContent = 'Artigo não encontrado';
+                conteudoEl.innerHTML = '<p>O artigo solicitado não foi encontrado.</p>';
                 return;
             }
 
             try {
-                // Busca por slug usando query param (padrão do backend)
                 const response = await fetch(`${backendUrl}/api/artigos?slug=${slug}`);
                 if (!response.ok) throw new Error('Artigo não encontrado');
                 const artigos = await response.json();
-                if (!artigos.length) throw new Error('Artigo não encontrado');
+                if (!artigos || artigos.length === 0) throw new Error('Artigo não encontrado');
 
                 const artigo = artigos[0];
-                artigoId = artigo._id; // Guarda o ID para curtir/comentários
+                artigoId = artigo._id;
 
-                document.getElementById('artigo-titulo').textContent = artigo.titulo;
-                document.getElementById('artigo-autor-nome').textContent = artigo.autor || 'Yan Renat';
-                document.getElementById('artigo-data').textContent = new Date(artigo.data || new Date()).toLocaleDateString('pt-BR');
+                // Preenche os campos com segurança
+                tituloEl.textContent = artigo.titulo || 'Título não disponível';
+                autorNomeEl.textContent = artigo.autor || 'Yan Renat';
+                dataEl.textContent = artigo.data ? new Date(artigo.data).toLocaleDateString('pt-BR') : 'Data não informada';
 
-                // Formata o conteúdo com parágrafos
-                const conteudoFormatado = artigo.conteudo.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('');
-                document.getElementById('artigo-conteudo').innerHTML = conteudoFormatado;
+                // Conteúdo: verifica se existe e formata parágrafos
+                if (artigo.conteudo && typeof artigo.conteudo === 'string') {
+                    const paragrafos = artigo.conteudo.split('\n').filter(p => p.trim() !== '');
+                    conteudoEl.innerHTML = paragrafos.map(p => `<p>${p.trim()}</p>`).join('');
+                } else {
+                    conteudoEl.innerHTML = '<p>Conteúdo não disponível.</p>';
+                }
 
-                // Atualiza botão de curtir e contador
-                document.getElementById('curtidas-count').textContent = artigo.curtidas || 0;
-                document.getElementById('btn-curtir').setAttribute('data-id', artigoId);
+                // Curtidas
+                curtidasEl.textContent = artigo.curtidas || 0;
+                btnCurtir.setAttribute('data-id', artigoId);
 
-                // Carrega comentários após ter o ID
+                // Carrega comentários
                 carregarComentarios();
-            } catch (err) {
-                console.error(err);
-                document.getElementById('artigo-titulo').textContent = 'Erro ao carregar';
-                document.getElementById('artigo-conteudo').innerHTML = '<p>Não foi possível carregar o conteúdo do artigo no momento.</p>';
+            } catch (error) {
+                console.error('Erro ao carregar artigo:', error);
+                tituloEl.textContent = 'Erro ao carregar';
+                conteudoEl.innerHTML = '<p>Não foi possível carregar o conteúdo do artigo no momento.</p>';
+                // Mesmo no erro, mantém data e autor vazios
+                autorNomeEl.textContent = '';
+                dataEl.textContent = '';
+                curtidasEl.textContent = '0';
             }
         }
 
         async function carregarComentarios() {
-            if (!artigoId) return;
+            const lista = document.getElementById('lista-comentarios');
+            if (!lista) return;
             try {
-                const response = await fetch(`${backendUrl}/api/artigos/${artigoId}/comentarios`);
-                const comentarios = await response.json(); // array direto
-
-                const lista = document.getElementById('lista-comentarios');
-                lista.innerHTML = comentarios.length === 0
-                    ? '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>'
-                    : '';
-
-                comentarios.forEach(c => {
-                    const div = document.createElement('div');
-                    div.className = 'comentario'; // usa a classe do CSS já existente
-                    div.innerHTML = `
-                        <strong>${c.nome}</strong>
-                        <p>${c.conteudo.replace(/\n/g, '<br>')}</p>
-                        <small>${new Date(c.data).toLocaleDateString('pt-BR')} às ${new Date(c.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
-                    `;
-                    lista.appendChild(div);
-                });
-            } catch (err) {
-                console.error('Erro ao carregar comentários:', err);
-                document.getElementById('lista-comentarios').innerHTML = '<p>Erro ao carregar comentários.</p>';
+                const response = await fetch(`${backendUrl}/api/comentarios/${slug}`);
+                if (!response.ok) throw new Error('Erro ao buscar comentários');
+                const data = await response.json();
+                const comentarios = data.comments || data; // depende da API
+                if (!comentarios || comentarios.length === 0) {
+                    lista.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>';
+                    return;
+                }
+                lista.innerHTML = comentarios.map(c => `
+                    <div class="comentario">
+                        <strong>${c.nome || 'Anônimo'}</strong>
+                        <small>${c.data ? new Date(c.data).toLocaleString('pt-BR') : ''}</small>
+                        <p>${c.texto || c.conteudo || ''}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar comentários:', error);
+                lista.innerHTML = '<p>Erro ao carregar comentários.</p>';
             }
         }
 
@@ -186,45 +194,38 @@
             }
         });
 
-        // Evento de enviar comentário
-        document.getElementById('form-comentario').addEventListener('submit', async (e) => {
+        // Evento de comentário
+        document.getElementById('form-comentario').addEventListener('submit', async function (e) {
             e.preventDefault();
             if (!artigoId) return;
+            const nome = document.getElementById('comentario-nome').value.trim();
+            const texto = document.getElementById('comentario-texto').value.trim();
+            if (!nome || !texto) return;
 
-            const nomeInput = document.getElementById('comentario-nome');
-            const textoInput = document.getElementById('comentario-texto');
-            const btnEnviar = document.getElementById('btn-enviar-comentario');
-
-            const nome = nomeInput.value.trim();
-            const conteudo = textoInput.value.trim();
-
-            btnEnviar.disabled = true;
-            btnEnviar.textContent = 'Enviando...';
+            const btn = document.querySelector('#form-comentario button');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
 
             try {
-                const response = await fetch(`${backendUrl}/api/artigos/${artigoId}/comentarios`, {
+                const response = await fetch(`${backendUrl}/api/comentarios/${slug}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, conteudo })
+                    body: JSON.stringify({ nome, texto })
                 });
-
                 if (response.ok) {
-                    nomeInput.value = '';
-                    textoInput.value = '';
+                    document.getElementById('form-comentario').reset();
                     carregarComentarios();
                 } else {
-                    alert('Erro ao enviar comentário. Por favor, tente novamente.');
+                    alert('Erro ao enviar comentário.');
                 }
             } catch (err) {
-                console.error('Erro ao enviar comentário:', err);
-                alert('Erro de conexão ao enviar comentário.');
+                console.error(err);
+                alert('Erro de conexão.');
             } finally {
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Comentário';
+                btn.disabled = false;
+                btn.textContent = 'Enviar Comentário';
             }
         });
-
-        document.addEventListener('DOMContentLoaded', carregarArtigo);
 
         // Menu mobile
         const menuToggle = document.querySelector('.menu-toggle');
@@ -232,6 +233,9 @@
         if (menuToggle && nav) {
             menuToggle.addEventListener('click', () => nav.classList.toggle('active'));
         }
+
+        // Inicia carregamento
+        carregarArtigo();
     </script>
 </body>
 
