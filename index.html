@@ -18,37 +18,46 @@
 
 <body>
     <!-- Cabeçalho -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <img src="images/logo-yan-renat3.jpg"
-                    alt="Logotipo do escritório Yan Renat Advocacia e Consultoria Jurídica" class="logo-img">
+<header class="header">
+    <div class="container">
+        <!-- Logo agora é um link para o topo da página -->
+        <a href="#home" class="logo">
+            <img src="images/logo-yan-renat3.jpg"
+                 alt="Logotipo do escritório Yan Renat Advocacia e Consultoria Jurídica"
+                 class="logo-img">
+        </a>
+
+        <button class="menu-toggle" aria-label="Toggle Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#areas">Áreas de Atuação</a></li>
+                <li><a href="#artigos">Artigos Jurídicos</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <div class="social-top">
+                <a href="https://www.linkedin.com/in/yan-leite/" target="_blank" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://www.instagram.com/yanleite.adv/" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://x.com/yanrenatleite" target="_blank" aria-label="X">
+                    <i class="fab fa-x"></i>
+                </a>
+                <a href="https://www.youtube.com/@DireitoNaPráticaComYanRenat" target="_blank" aria-label="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
             </div>
-            <button class="menu-toggle" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
-            <nav class="nav">
-                <ul class="nav-list">
-                    <li><a href="#home">Início</a></li>
-                    <li><a href="#sobre">Sobre</a></li>
-                    <li><a href="#areas">Áreas de Atuação</a></li>
-                    <li><a href="#artigos">Artigos Jurídicos</a></li>
-                    <!-- Contato removido do menu -->
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <div class="social-top">
-                    <a href="https://www.linkedin.com/in/yan-leite/" target="_blank"
-                        aria-label="Perfil LinkedIn de Yan Renat"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://www.instagram.com/yanleite.adv/" target="_blank"
-                        aria-label="Perfil Instagram de Yan Renat"><i class="fab fa-instagram"></i></a>
-                    <a href="https://x.com/yanrenatleite" target="_blank" aria-label="Perfil X de Yan Renat"><i
-                            class="fab fa-x"></i></a>
-                    <a href="https://www.youtube.com/@DireitoNaPráticaComYanRenat" target="_blank"
-                        aria-label="Canal YouTube de Yan Renat"><i class="fab fa-youtube"></i></a>
-                </div>
-                <a href="#contato" class="btn-cta">Fale Conosco</a>
-            </div>
+            <a href="#contato" class="btn-cta">Fale Conosco</a>
         </div>
-    </header>
+    </div>
+</header>
 
     <!-- Botão Flutuante WhatsApp -->
     <div class="whatsapp-container">
