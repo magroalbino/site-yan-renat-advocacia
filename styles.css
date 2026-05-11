@@ -800,3 +800,24 @@ body {
     font-size: 14px;
     margin-bottom: 10px;
 }
+
+.comentario-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.btn-excluir-comentario {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    margin-left: auto;
+    transition: color 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-excluir-comentario:hover {
+    color: #ff0000;
+}

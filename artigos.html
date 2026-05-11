@@ -26,7 +26,6 @@
             <button class="menu-toggle" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
             <nav class="nav">
                 <ul class="nav-list">
-                    <li><a href="index.html#home">Início</a></li>
                     <li><a href="index.html#sobre">Sobre</a></li>
                     <li><a href="index.html#areas">Áreas de Atuação</a></li>
                     <li><a href="index.html#artigos">Artigos Jurídicos</a></li>
@@ -179,15 +178,50 @@
                     return;
                 }
                 lista.innerHTML = comentarios.map(c => `
-                    <div class="comentario">
-                        <strong>${c.nome || 'Anônimo'}</strong>
-                        <small>${c.data ? new Date(c.data).toLocaleString('pt-BR') : ''}</small>
+                    <div class="comentario" id="com-${c._id}">
+                        <div class="comentario-header">
+                            <strong>${c.nome || 'Anônimo'}</strong>
+                            <small>${c.data ? new Date(c.data).toLocaleString('pt-BR') : ''}</small>
+                            <button class="btn-excluir-comentario" data-id="${c._id}" title="Excluir comentário">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
                         <p>${c.texto || c.conteudo || ''}</p>
                     </div>
                 `).join('');
+
+                // Adicionar eventos de exclusão a cada botão
+                document.querySelectorAll('.btn-excluir-comentario').forEach(botao => {
+                    botao.addEventListener('click', excluirComentario);
+                });
             } catch (error) {
                 console.error('Erro ao carregar comentários:', error);
                 lista.innerHTML = '<p>Erro ao carregar comentários.</p>';
+            }
+        }
+
+        // Função para excluir comentário
+        async function excluirComentario(e) {
+            const btn = e.currentTarget;
+            const id = btn.dataset.id;
+            if (!confirm('Tem certeza que deseja excluir este comentário?')) return;
+            try {
+                const res = await fetch(`${backendUrl}/api/comentarios/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    // Remove o elemento do DOM
+                    const comentarioDiv = document.getElementById(`com-${id}`);
+                    if (comentarioDiv) comentarioDiv.remove();
+                    // Se a lista ficar vazia, atualiza a mensagem
+                    const lista = document.getElementById('lista-comentarios');
+                    if (lista.children.length === 0) {
+                        lista.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>';
+                    }
+                } else {
+                    alert('Erro ao excluir comentário.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de conexão.');
             }
         }
 
@@ -207,7 +241,6 @@
 
                 document.getElementById('curtidas-count').textContent = data.curtidas;
 
-                // Alterna o estado
                 if (liked) {
                     localStorage.removeItem(`like_${id}`);
                 } else {
