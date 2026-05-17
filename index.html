@@ -186,8 +186,7 @@
             if (!grid) return;
 
             try {
-                const response = await fetch(`${backendUrl}/api/artigos.buscar?slug=${slug}`);
-                if (!response.ok) throw new Error('Falha na resposta da API');
+                const response = await fetch(`${backendUrl}/api/artigos`); if (!response.ok) throw new Error('Falha na resposta da API');
 
                 const artigos = await response.json();
 
