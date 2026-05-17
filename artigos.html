@@ -110,10 +110,13 @@
         const curtidasEl = document.getElementById('curtidas-count');
         const btnCurtir = document.getElementById('btn-curtir');
 
+        let curtirEmAndamento = false;   // trava para evitar múltiplos cliques
+
         // Atualiza o botão de acordo com o estado armazenado no navegador
         function atualizarBotaoCurtir() {
             if (!artigoId) return;
             const liked = localStorage.getItem(`like_${artigoId}`) === 'true';
+            console.log('🔄 Atualizando botão. liked =', liked);
             if (liked) {
                 btnCurtir.innerHTML = '<i class="fas fa-thumbs-down"></i> Descurtir';
                 btnCurtir.classList.add('descurtir');
@@ -138,6 +141,7 @@
 
                 const artigo = artigos[0];
                 artigoId = artigo._id;
+                console.log('✅ Artigo carregado. ID:', artigoId, 'Curtidas:', artigo.curtidas);
 
                 tituloEl.textContent = artigo.titulo || 'Título não disponível';
                 autorNomeEl.textContent = artigo.autor || 'Yan Renat';
@@ -165,6 +169,45 @@
             }
         }
 
+        // Evento de curtir/descurtir (COM LOGS e trava)
+        btnCurtir.addEventListener('click', async function () {
+            const id = this.dataset.id;
+            console.log('👆 Clique no botão curtir. ID:', id, 'Em andamento:', curtirEmAndamento);
+            if (!id || curtirEmAndamento) return;
+
+            curtirEmAndamento = true;
+            btnCurtir.disabled = true;
+
+            const liked = localStorage.getItem(`like_${id}`) === 'true';
+            const endpoint = liked ? 'descurtir' : 'curtir';
+            const url = `${backendUrl}/api/artigos/${id}/${endpoint}`;
+            console.log(`📡 Enviando ${endpoint} para: ${url}`);
+
+            try {
+                const res = await fetch(url, { method: 'POST' });
+                console.log('📨 Resposta:', res.status);
+                if (!res.ok) throw new Error('Erro na requisição');
+                const data = await res.json();
+                console.log('📊 Dados recebidos:', data);
+
+                document.getElementById('curtidas-count').textContent = data.curtidas;
+
+                if (liked) {
+                    localStorage.removeItem(`like_${id}`);
+                } else {
+                    localStorage.setItem(`like_${id}`, 'true');
+                }
+                atualizarBotaoCurtir();
+            } catch (err) {
+                console.error('Erro ao curtir/descurtir:', err);
+                alert('Não foi possível realizar a ação.');
+            } finally {
+                curtirEmAndamento = false;
+                btnCurtir.disabled = false;
+            }
+        });
+
+        // ---- Comentários (mantidos iguais) ----
         async function carregarComentarios() {
             const lista = document.getElementById('lista-comentarios');
             if (!lista) return;
@@ -224,34 +267,6 @@
                 alert('Erro de conexão.');
             }
         }
-
-        // Evento de curtir/descurtir
-        btnCurtir.addEventListener('click', async function () {
-            const id = this.dataset.id;
-            if (!id) return;
-
-            const liked = localStorage.getItem(`like_${id}`) === 'true';
-            const endpoint = liked ? 'descurtir' : 'curtir';
-            const url = `${backendUrl}/api/artigos/${id}/${endpoint}`;
-
-            try {
-                const res = await fetch(url, { method: 'POST' });
-                if (!res.ok) throw new Error('Erro na requisição');
-                const data = await res.json();
-
-                document.getElementById('curtidas-count').textContent = data.curtidas;
-
-                if (liked) {
-                    localStorage.removeItem(`like_${id}`);
-                } else {
-                    localStorage.setItem(`like_${id}`, 'true');
-                }
-                atualizarBotaoCurtir();
-            } catch (err) {
-                console.error('Erro ao curtir/descurtir:', err);
-                alert('Não foi possível realizar a ação.');
-            }
-        });
 
         // Evento de comentário
         document.getElementById('form-comentario').addEventListener('submit', async function (e) {
