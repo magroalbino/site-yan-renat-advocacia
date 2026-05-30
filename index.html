@@ -188,7 +188,9 @@
             try {
                 const response = await fetch(`${backendUrl}/api/artigos`); if (!response.ok) throw new Error('Falha na resposta da API');
 
-                const artigos = await response.json();
+                const data = await response.json();
+                const artigos = data.artigos || data;
+
 
                 if (!artigos || artigos.length === 0) {
                     grid.innerHTML = '<p>Nenhum artigo encontrado no momento.</p>';
