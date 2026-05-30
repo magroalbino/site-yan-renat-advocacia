@@ -134,12 +134,10 @@
             }
 
             try {
-                const response = await fetch(`${backendUrl}/api/artigos?slug=${slug}`);
+                const response = await fetch(`${backendUrl}/api/artigos/${slug}`);
                 if (!response.ok) throw new Error('Artigo não encontrado');
-                const artigos = await response.json();
-                if (!artigos || artigos.length === 0) throw new Error('Artigo não encontrado');
-
-                const artigo = artigos[0];
+                const artigo = await response.json();
+                if (!artigo) throw new Error('Artigo não encontrado');
                 artigoId = artigo._id;
                 console.log('✅ Artigo carregado. ID:', artigoId, 'Curtidas:', artigo.curtidas);
 
