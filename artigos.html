@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://site-backend-yan-renat-advocacia.vercel.app; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()">
     <title>Artigo - Yan Renat Advocacia</title>
     <link rel="stylesheet" href="styles.css">
     <link
@@ -33,13 +37,14 @@
             </nav>
             <div class="header-actions">
                 <div class="social-top">
-                    <a href="https://www.linkedin.com/in/yan-leite/" target="_blank" aria-label="LinkedIn"><i
-                            class="fab fa-linkedin"></i></a>
-                    <a href="https://www.instagram.com/yanrenat.adv/" target="_blank" aria-label="Instagram"><i
-                            class="fab fa-instagram"></i></a>
-                    <a href="https://x.com/yanrenatleite" target="_blank" aria-label="X"><i class="fab fa-x"></i></a>
+                    <a href="https://www.linkedin.com/in/yan-leite/" target="_blank" rel="noopener noreferrer"
+                        aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/yanrenat.adv/" target="_blank" rel="noopener noreferrer"
+                        aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/yanrenatleite" target="_blank" rel="noopener noreferrer" aria-label="X"><i
+                            class="fab fa-x"></i></a>
                     <a href="https://www.youtube.com/@DireitoNaPráticaComYanRenat" target="_blank"
-                        aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                 </div>
                 <a href="index.html#contato" class="btn-cta">Fale Conosco</a>
             </div>
@@ -48,7 +53,8 @@
 
     <!-- WhatsApp Flutuante -->
     <div class="whatsapp-container">
-        <a href="https://wa.me/5571994012015" target="_blank" class="whatsapp-float" aria-label="Contato via WhatsApp">
+        <a href="https://wa.me/5571994012015" target="_blank" rel="noopener noreferrer" class="whatsapp-float"
+            aria-label="Contato via WhatsApp">
             <i class="fab fa-whatsapp"></i>
         </a>
         <span class="whatsapp-text">Como posso ajudar?</span>
@@ -80,8 +86,11 @@
                 <div class="comentario-form" style="margin-top: 40px;">
                     <h4>Deixe seu Comentário</h4>
                     <form id="form-comentario">
-                        <input type="text" id="comentario-nome" placeholder="Seu Nome" required>
-                        <textarea id="comentario-texto" placeholder="Digite seu comentário..." required></textarea>
+                        <input type="text" id="comentario-nome" placeholder="Seu Nome" maxlength="80" required>
+                        <textarea id="comentario-texto" placeholder="Digite seu comentário..." maxlength="500"
+                            required></textarea>
+                        <input type="text" id="comment-website" tabindex="-1" autocomplete="off"
+                            style="position:absolute; left:-9999px; width:0; height:0; opacity:0; pointer-events:none;">
                         <button type="submit" class="btn-cta">Enviar Comentário</button>
                     </form>
                 </div>
@@ -97,6 +106,35 @@
     </footer>
 
     <script>
+        function sanitizeText(value, maxLength = 0) {
+            const clean = String(value ?? '')
+                .replace(/<[^>]*>/g, '')
+                .replace(/\u0000/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            return maxLength > 0 ? clean.slice(0, maxLength) : clean;
+        }
+
+        function limparEstruturaVazia(elemento) {
+            while (elemento.firstChild) {
+                elemento.removeChild(elemento.firstChild);
+            }
+        }
+
+        function validarComentario(nome, texto) {
+            if (nome.length > 80 || texto.length > 500) {
+                throw new Error('Nome ou comentário excederam o limite permitido.');
+            }
+
+            if (!nome.trim() || !texto.trim()) {
+                throw new Error('Preencha nome e comentário antes de enviar.');
+            }
+        }
+
+        const COMMENT_MIN_DELAY = 4000;
+        let lastCommentSubmit = 0;
+
         const backendUrl = 'https://site-backend-yan-renat-advocacia.vercel.app';
         const params = new URLSearchParams(window.location.search);
         const slug = params.get('slug');
@@ -138,7 +176,6 @@
                 const res = await fetch(`${backendUrl}/api/artigos/${id}/${endpoint}`, { method: 'POST' });
 
                 if (!res.ok) {
-                    // Se descurtir falhou com 400 (zero curtidas), corrige o estado local
                     if (res.status === 400 && liked) {
                         localStorage.removeItem(`like_${id}`);
                         atualizarBotaoCurtir();
@@ -170,7 +207,10 @@
         async function carregarArtigo() {
             if (!slug) {
                 tituloEl.textContent = 'Artigo nao encontrado';
-                conteudoEl.innerHTML = '<p>O artigo solicitado nao foi encontrado.</p>';
+                limparEstruturaVazia(conteudoEl);
+                const paragrafo = document.createElement('p');
+                paragrafo.textContent = 'O artigo solicitado nao foi encontrado.';
+                conteudoEl.appendChild(paragrafo);
                 return;
             }
 
@@ -179,7 +219,6 @@
                 if (!response.ok) throw new Error('Artigo nao encontrado');
                 const artigo = await response.json();
 
-                // Compatibilidade: se retornar array, pega o primeiro
                 const dados = Array.isArray(artigo) ? artigo[0] : artigo;
                 if (!dados) throw new Error('Artigo nao encontrado');
 
@@ -188,18 +227,23 @@
                 autorNomeEl.textContent = dados.autor || 'Yan Renat';
                 dataEl.textContent = dados.data ? new Date(dados.data).toLocaleDateString('pt-BR') : '';
 
+                limparEstruturaVazia(conteudoEl);
                 if (dados.conteudo && dados.conteudo.trim().length > 0) {
-                    const paragrafos = dados.conteudo.split('\n').filter(p => p.trim() !== '');
-                    conteudoEl.innerHTML = paragrafos.map(p => `<p>${p.trim()}</p>`).join('');
+                    const paragrafos = String(dados.conteudo).split('\n').filter(p => p.trim() !== '');
+                    paragrafos.forEach((p) => {
+                        const paragrafo = document.createElement('p');
+                        paragrafo.textContent = p.trim();
+                        conteudoEl.appendChild(paragrafo);
+                    });
                 } else {
-                    conteudoEl.innerHTML = '<p>Conteudo nao disponivel.</p>';
+                    const paragrafo = document.createElement('p');
+                    paragrafo.textContent = 'Conteudo nao disponivel.';
+                    conteudoEl.appendChild(paragrafo);
                 }
 
                 curtidasEl.textContent = dados.curtidas || 0;
                 btnCurtir.setAttribute('data-id', artigoId);
 
-                // Sincroniza estado do botao com o backend:
-                // Se localStorage diz "curtido" mas o artigo tem 0 curtidas, limpa o estado
                 const curtidas = dados.curtidas || 0;
                 const likedLocal = localStorage.getItem(`like_${artigoId}`) === 'true';
                 if (likedLocal && curtidas === 0) {
@@ -211,7 +255,10 @@
             } catch (error) {
                 console.error('Erro ao carregar artigo:', error);
                 tituloEl.textContent = 'Erro ao carregar';
-                conteudoEl.innerHTML = '<p>Nao foi possivel carregar o conteudo do artigo no momento.</p>';
+                limparEstruturaVazia(conteudoEl);
+                const paragrafo = document.createElement('p');
+                paragrafo.textContent = 'Nao foi possivel carregar o conteudo do artigo no momento.';
+                conteudoEl.appendChild(paragrafo);
                 autorNomeEl.textContent = '';
                 dataEl.textContent = '';
                 curtidasEl.textContent = '0';
@@ -220,7 +267,6 @@
 
         // ---- Comentarios ----
 
-        // Verifica se o usuario atual e o autor de um comentario
         function temTokenDoComentario(commentId) {
             return !!localStorage.getItem(`comment_token_${commentId}`);
         }
@@ -235,42 +281,58 @@
                 const data = await response.json();
                 const comentarios = data.comments || data;
 
+                limparEstruturaVazia(lista);
                 if (!comentarios || comentarios.length === 0) {
-                    lista.innerHTML = '<p>Nenhum comentario ainda. Seja o primeiro a comentar!</p>';
+                    const aviso = document.createElement('p');
+                    aviso.textContent = 'Nenhum comentario ainda. Seja o primeiro a comentar!';
+                    lista.appendChild(aviso);
                     return;
                 }
 
-                lista.innerHTML = comentarios.map(c => {
-                    // So mostra o botao de excluir se o usuario for o autor do comentario
+                comentarios.forEach((c) => {
                     const podeExcluir = temTokenDoComentario(c._id);
-                    const btnExcluir = podeExcluir
-                        ? `<button class="btn-excluir-comentario" data-id="${c._id}" title="Excluir comentario">
-                     <i class="fas fa-trash-alt"></i>
-                   </button>`
-                        : '';
+                    const comentario = document.createElement('div');
+                    comentario.className = 'comentario';
+                    comentario.id = `com-${c._id}`;
 
-                    return `
-                <div class="comentario" id="com-${c._id}">
-                    <div class="comentario-header">
-                        <strong>${c.nome || 'Anonimo'}</strong>
-                        <small>${c.data ? new Date(c.data).toLocaleString('pt-BR') : ''}</small>
-                        ${btnExcluir}
-                    </div>
-                    <p>${c.texto || c.conteudo || ''}</p>
-                </div>
-            `;
-                }).join('');
+                    const header = document.createElement('div');
+                    header.className = 'comentario-header';
 
-                document.querySelectorAll('.btn-excluir-comentario').forEach(botao => {
-                    botao.addEventListener('click', excluirComentario);
+                    const nome = document.createElement('strong');
+                    nome.textContent = c.nome || 'Anonimo';
+
+                    const dataComentario = document.createElement('small');
+                    dataComentario.textContent = c.data ? new Date(c.data).toLocaleString('pt-BR') : '';
+
+                    header.appendChild(nome);
+                    header.appendChild(dataComentario);
+
+                    if (podeExcluir) {
+                        const btnExcluir = document.createElement('button');
+                        btnExcluir.className = 'btn-excluir-comentario';
+                        btnExcluir.dataset.id = c._id;
+                        btnExcluir.title = 'Excluir comentario';
+                        btnExcluir.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                        btnExcluir.addEventListener('click', excluirComentario);
+                        header.appendChild(btnExcluir);
+                    }
+
+                    const texto = document.createElement('p');
+                    texto.textContent = c.texto || c.conteudo || '';
+
+                    comentario.appendChild(header);
+                    comentario.appendChild(texto);
+                    lista.appendChild(comentario);
                 });
             } catch (error) {
                 console.error('Erro ao carregar comentarios:', error);
-                lista.innerHTML = '<p>Erro ao carregar comentarios.</p>';
+                limparEstruturaVazia(lista);
+                const aviso = document.createElement('p');
+                aviso.textContent = 'Erro ao carregar comentarios.';
+                lista.appendChild(aviso);
             }
         }
 
-        // Exclui comentario enviando o autorToken no header
         async function excluirComentario(e) {
             const btn = e.currentTarget;
             const id = btn.dataset.id;
@@ -298,7 +360,10 @@
 
                     const lista = document.getElementById('lista-comentarios');
                     if (lista && lista.children.length === 0) {
-                        lista.innerHTML = '<p>Nenhum comentario ainda. Seja o primeiro a comentar!</p>';
+                        limparEstruturaVazia(lista);
+                        const aviso = document.createElement('p');
+                        aviso.textContent = 'Nenhum comentario ainda. Seja o primeiro a comentar!';
+                        lista.appendChild(aviso);
                     }
                 } else {
                     const data = await res.json().catch(() => ({}));
@@ -310,18 +375,36 @@
             }
         }
 
-        // Cria comentario e salva o autorToken no localStorage
         document.getElementById('form-comentario').addEventListener('submit', async function (e) {
             e.preventDefault();
             if (!artigoId) return;
 
-            const nome = document.getElementById('comentario-nome').value.trim();
-            const texto = document.getElementById('comentario-texto').value.trim();
-            if (!nome || !texto) return;
+            const now = Date.now();
+            if (now - lastCommentSubmit < COMMENT_MIN_DELAY) {
+                alert('Aguarde alguns segundos antes de enviar outro comentário.');
+                return;
+            }
+
+            const honeypot = document.getElementById('comment-website').value.trim();
+            if (honeypot) {
+                document.getElementById('form-comentario').reset();
+                return;
+            }
+
+            const nome = sanitizeText(document.getElementById('comentario-nome').value, 80);
+            const texto = sanitizeText(document.getElementById('comentario-texto').value, 500);
+
+            try {
+                validarComentario(nome, texto);
+            } catch (error) {
+                alert(error.message || 'Dados inválidos.');
+                return;
+            }
 
             const btn = document.querySelector('#form-comentario button');
             btn.disabled = true;
             btn.textContent = 'Enviando...';
+            lastCommentSubmit = now;
 
             try {
                 const response = await fetch(`${backendUrl}/api/comentarios/${slug}`, {
@@ -333,7 +416,6 @@
                 if (response.ok) {
                     const data = await response.json();
 
-                    // Salva o token do autor para poder excluir depois
                     if (data.autorToken && data.comment && data.comment._id) {
                         localStorage.setItem(`comment_token_${data.comment._id}`, data.autorToken);
                     }
@@ -352,16 +434,10 @@
             }
         });
 
-        // ---- Menu mobile ----
-        const menuToggle = document.querySelector('.menu-toggle');
-        const nav = document.querySelector('.nav');
-        if (menuToggle && nav) {
-            menuToggle.addEventListener('click', () => nav.classList.toggle('active'));
-        }
-
         // ---- Iniciar ----
         carregarArtigo();
     </script>
+    <script type="module" src="scripts.js"></script>
 </body>
 
 </html>

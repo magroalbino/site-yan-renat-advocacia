@@ -42,28 +42,17 @@ Os artigos jurídicos são carregados dinamicamente a partir de um **backend sep
 
 ---
 
-## 📂 Estrutura de Pastas
-
-A estrutura do projeto foi organizada para manter clareza, escalabilidade e fácil manutenção:
+## 📂 Estrutura do Projeto
 
 ```
 site-yan-renat-advocacia/
-├── public/
-│   ├── index.html              # Página principal do site
-│   ├── artigo.html             # Página individual de artigo
-│   ├── assets/
-│   │   ├── css/
-│   │   │   └── styles.css      # Estilos globais
-│   │   ├── js/
-│   │   │   └── scripts.js      # Scripts JavaScript
-│   │   └── images/
-│   │       ├── logo-yan-renat3.jpg
-│   │       ├── banner-juridico3.jpg
-│   │       └── favicon.ico
-│   └── fonts/                  # (Opcional) Fontes locais
-│
-├── README.md                   # Documentação do projeto
-└── .gitignore                  # Arquivos ignorados pelo Git
+├── index.html       # Página inicial
+├── artigos.html     # Página de leitura de artigos
+├── scripts.js       # Menu, listagem de artigos e formulário de contato
+├── styles.css       # Estilos globais
+├── images/          # Imagens e favicon
+├── vite.config.js   # Configuração do servidor e build multipágina
+└── package.json     # Scripts e dependências
 ```
 
 ---
@@ -94,7 +83,7 @@ site-yan-renat-advocacia/
 Os artigos são carregados dinamicamente a partir do backend:
 
 ```
-GET https://backend-yan-renat-advocacia.vercel.app/api/artigos
+GET https://site-backend-yan-renat-advocacia.vercel.app/api/artigos
 ```
 
 Essa abordagem permite atualizar conteúdos jurídicos sem necessidade de alterações no frontend.
@@ -115,21 +104,25 @@ Essa abordagem permite atualizar conteúdos jurídicos sem necessidade de altera
 
 ## 🚀 Como Executar o Projeto Localmente
 
-1. Clone o repositório:
+1. Instale as dependências:
 
 ```bash
-git clone https://github.com/seu-usuario/site-yan-renat-advocacia.git
+npm install
 ```
 
-2. Acesse a pasta do projeto:
+2. Inicie o servidor local:
 
 ```bash
-cd site-yan-renat-advocacia
+npm run dev
 ```
 
-3. Abra o arquivo `index.html` no navegador
+Para gerar os arquivos de publicação, execute:
 
-> Não é necessário servidor local para o frontend.
+```bash
+npm run build
+```
+
+O Vite gera as duas páginas (`index.html` e `artigos.html`) na pasta `dist/`.
 
 ---
 
@@ -142,4 +135,3 @@ Projeto de uso institucional e privado. Todos os direitos reservados ao **Yan Re
 
 **Yan Renat**  
 Advocacia e Consultoria Jurídica
-
